@@ -1,14 +1,5 @@
 package gui;
 
-import java.beans.Expression;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
-
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -21,15 +12,16 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 
-public class Calculator extends VBox implements EventHandler<ActionEvent> {
+public class Calculator extends VBox implements EventHandler<ActionEvent>{
 
 	String number1 = "";
 	String number2 = "";
-	String operator;
+	String operator="";
 	Text displayText;
-	int op = 0;
+	int flag = 0;
+	int result;
 
-	public Calculator() {
+	public Calculator(){
 		super(10);
 		this.displayText = new Text();
 
@@ -37,7 +29,7 @@ public class Calculator extends VBox implements EventHandler<ActionEvent> {
 
 		rt.setStroke(Color.GRAY);
 
-		StackPane sp = new StackPane(rt, this.displayText);
+		StackPane sp =  new StackPane(rt, this.displayText);
 
 		sp.setPadding(new Insets(10, 10, 10, 10));
 
@@ -137,86 +129,36 @@ public class Calculator extends VBox implements EventHandler<ActionEvent> {
 
 		Button b = (Button) event.getSource();
 		String value = b.getText();
-		String expression = displayText.getText();
-		String[] operadores = new String[] { "+", "-", "*", "/" };
+		if (value.equals("=")) {
+			if(operator.equals("+")) result = Integer.valueOf(number1)+Integer.valueOf(number2);
+			else if(operator.equals("-")) result = Integer.valueOf(number1)-Integer.valueOf(number2);
+			else if(operator.equals("*")) result = Integer.valueOf(number1)*Integer.valueOf(number2);
+			else if(operator.equals("/")) result = Integer.valueOf(number1)/Integer.valueOf(number2);
+			displayText.setText(String.valueOf(result));
 
-		try {
-			if (!Arrays.asList(operadores).contains(value) && value != "C" && value != "=") {
-				if (op == 0) {
-					number1 += value;
-					displayText.setText(number1);
-
-				} else {
-					number2 += value;
-					displayText.setText(number1 + operator + number2);
-
-				}
-			} else if (Arrays.asList(operadores).contains(value) && op<1)  {
-				operator = value;
-				if (value == "+") {
-					op = 1;
-				} else if (value == "-") {
-					op = 2;
-				} else if (value == "*") {
-					op = 3;
-				} else {
-					op = 4;
-				}
-				displayText.setText(number1 + operator);
-			} else if (value == "C") {
-				Limpiar();
-				displayText.setText("");
-
-			} else if (value == "="){
-				displayText.setText(Evaluar(number1, number2, op).toString());
-			}else {
-				number1=Evaluar(number1, number2, op).toString();
-				number2="";
-				operator=value;
-				if (value == "+") {
-					op = 1;
-				} else if (value == "-") {
-					op = 2;
-				} else if (value == "*") {
-					op = 3;
-				} else {
-					op = 4;
-				}			
-				displayText.setText(number1 + operator);
-
-			}
-	
+		}else if(value.equals("C")) {
+			number1="";
+			number2 = "";
+			result= 0;
+			flag = 0;
+			displayText.setText(null);
+		} else if(value.equals("+")||value.equals("-")||value.equals("*")||value.equals("/")) {
+			operator = value;
+			flag = 1;
+			displayText.setText(null);
+		}else if (flag == 0) {
+			number1 += value;
+			displayText.setText(number1);
+		} else {
+			number2 += value;
+			displayText.setText(number2);
 		}
-		catch(Exception e){
-			Limpiar();
-			displayText.setText("Error");
 
-		}
-		
+
+
+
+
 	}
 
-	private Integer Evaluar(String n1, String n2, int o) {
-		Integer f1 = Integer.valueOf(n1);
-		Integer f2 = Integer.valueOf(n2);
-		Integer ans = 0;
 
-		if (o == 1) { // Addition
-			ans = f1 + f2;
-		} else if (o == 2) {
-			ans = f1 - f2;
-		} else if (o == 3) {
-			ans = f1 * f2;
-		} else if (o == 4) {
-			ans = f1 / f2;
-		}
-		Limpiar();
-		return ans;
-	}
-
-	public void Limpiar() {
-		number1 = "";
-		number2 = "";
-		operator = "";
-		op = 0;
-	}
 }
